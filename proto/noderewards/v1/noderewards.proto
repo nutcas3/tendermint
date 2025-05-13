@@ -1,0 +1,77 @@
+syntax = "proto3";
+package noderewards.v1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/serv-chain/serv/x/noderewards/types";
+
+// NodePerformance represents performance metrics for a validator node.
+message NodePerformance {
+  string validator_addr = 1;
+  string service_score = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string uptime_percent = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string response_time = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  int64 last_update_height = 5;
+}
+
+// RewardModifier represents parameters for modifying staking rewards.
+message RewardModifier {
+  string service_score_weight = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string uptime_weight = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string response_time_weight = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string min_modifier = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string max_modifier = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+// Query defines the noderewards Query service.
+service Query {
+  // RewardModifier queries the current reward modifier parameters.
+  rpc RewardModifier(QueryRewardModifierRequest) returns (QueryRewardModifierResponse) {
+    option (google.api.http).get = "/noderewards/v1/params";
+  }
+
+  // NodePerformance queries the performance metrics for a validator node.
+  rpc NodePerformance(QueryNodePerformanceRequest) returns (QueryNodePerformanceResponse) {
+    option (google.api.http).get = "/noderewards/v1/performance/{validator_addr}";
+  }
+
+  // RewardModifierForValidator queries the calculated reward modifier for a validator.
+  rpc RewardModifierForValidator(QueryRewardModifierForValidatorRequest) returns (QueryRewardModifierForValidatorResponse) {
+    option (google.api.http).get = "/noderewards/v1/modifier/{validator_addr}";
+  }
+}
+
+// QueryRewardModifierRequest is the request type for the Query/RewardModifier RPC method.
+message QueryRewardModifierRequest {}
+
+// QueryRewardModifierResponse is the response type for the Query/RewardModifier RPC method.
+message QueryRewardModifierResponse {
+  RewardModifier modifier = 1;
+}
+
+// QueryNodePerformanceRequest is the request type for the Query/NodePerformance RPC method.
+message QueryNodePerformanceRequest {
+  string validator_addr = 1;
+}
+
+// QueryNodePerformanceResponse is the response type for the Query/NodePerformance RPC method.
+message QueryNodePerformanceResponse {
+  NodePerformance performance = 1;
+}
+
+// QueryRewardModifierForValidatorRequest is the request type for the Query/RewardModifierForValidator RPC method.
+message QueryRewardModifierForValidatorRequest {
+  string validator_addr = 1;
+}
+
+// QueryRewardModifierForValidatorResponse is the response type for the Query/RewardModifierForValidator RPC method.
+message QueryRewardModifierForValidatorResponse {
+  string modifier = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+// GenesisState defines the noderewards module's genesis state.
+message GenesisState {
+  RewardModifier reward_modifier = 1;
+  repeated NodePerformance node_performances = 2;
+}
