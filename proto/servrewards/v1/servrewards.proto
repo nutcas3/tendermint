@@ -1,0 +1,116 @@
+syntax = "proto3";
+package servrewards.v1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/serv-chain/serv/x/servrewards/types";
+
+// Msg defines the servrewards Msg service.
+service Msg {
+  // ClaimReward defines a method for claiming accumulated rewards.
+  rpc ClaimReward(MsgClaimReward) returns (MsgClaimRewardResponse) {
+    option (google.api.http).post = "/servrewards/v1/claim_reward";
+  }
+
+  // UpdateRewardParams defines a method for updating reward parameters.
+  rpc UpdateRewardParams(MsgUpdateRewardParams) returns (MsgUpdateRewardParamsResponse) {
+    option (google.api.http).post = "/servrewards/v1/update_reward_params";
+  }
+}
+
+// MsgClaimReward represents a message to claim accumulated rewards.
+message MsgClaimReward {
+  string claimer = 1;
+}
+
+// MsgClaimRewardResponse defines the response for MsgClaimReward.
+message MsgClaimRewardResponse {
+  string amount = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+}
+
+// MsgUpdateRewardParams represents a message to update reward parameters.
+message MsgUpdateRewardParams {
+  string authority = 1;
+  string service_score_weight = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string staking_weight = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string reward_per_epoch = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  uint64 epoch_duration = 5;
+}
+
+// MsgUpdateRewardParamsResponse defines the response for MsgUpdateRewardParams.
+message MsgUpdateRewardParamsResponse {}
+
+// RewardMetrics represents the metrics used to calculate rewards.
+message RewardMetrics {
+  string total_service_score = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string total_staked = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  uint64 epoch_number = 3;
+}
+
+// RewardParams represents the parameters for reward calculation.
+message RewardParams {
+  string service_score_weight = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string staking_weight = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string reward_per_epoch = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  uint64 epoch_duration = 4;
+}
+
+// AccumulatedRewards represents the rewards accumulated for an address.
+message AccumulatedRewards {
+  string address = 1;
+  string rewards = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  uint64 last_claim = 3;
+}
+
+// Query defines the servrewards Query service.
+service Query {
+  // RewardMetrics queries the current reward metrics.
+  rpc RewardMetrics(QueryRewardMetricsRequest) returns (QueryRewardMetricsResponse) {
+    option (google.api.http).get = "/servrewards/v1/metrics";
+  }
+
+  // RewardParams queries the current reward parameters.
+  rpc RewardParams(QueryRewardParamsRequest) returns (QueryRewardParamsResponse) {
+    option (google.api.http).get = "/servrewards/v1/params";
+  }
+
+  // AccumulatedRewards queries the accumulated rewards for an address.
+  rpc AccumulatedRewards(QueryAccumulatedRewardsRequest) returns (QueryAccumulatedRewardsResponse) {
+    option (google.api.http).get = "/servrewards/v1/rewards/{address}";
+  }
+}
+
+// QueryRewardMetricsRequest is the request type for the Query/RewardMetrics RPC method.
+message QueryRewardMetricsRequest {}
+
+// QueryRewardMetricsResponse is the response type for the Query/RewardMetrics RPC method.
+message QueryRewardMetricsResponse {
+  RewardMetrics metrics = 1;
+}
+
+// QueryRewardParamsRequest is the request type for the Query/RewardParams RPC method.
+message QueryRewardParamsRequest {}
+
+// QueryRewardParamsResponse is the response type for the Query/RewardParams RPC method.
+message QueryRewardParamsResponse {
+  RewardParams params = 1;
+}
+
+// QueryAccumulatedRewardsRequest is the request type for the Query/AccumulatedRewards RPC method.
+message QueryAccumulatedRewardsRequest {
+  string address = 1;
+}
+
+// QueryAccumulatedRewardsResponse is the response type for the Query/AccumulatedRewards RPC method.
+message QueryAccumulatedRewardsResponse {
+  AccumulatedRewards rewards = 1;
+}
+
+// GenesisState defines the servrewards module's genesis state.
+message GenesisState {
+  RewardMetrics reward_metrics = 1;
+  RewardParams reward_params = 2;
+  repeated AccumulatedRewards accumulated_rewards = 3;
+}
