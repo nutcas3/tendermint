@@ -19,6 +19,8 @@ require (
 	github.com/cosmos/cosmos-sdk v0.53.0
 )
 
+require github.com/confio/ics23/go v0.9.0 // indirect
+
 require (
 	cosmossdk.io/api v0.9.2 // indirect
 	cosmossdk.io/errors v1.0.2 // indirect
@@ -29,7 +31,7 @@ require (
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 	github.com/99designs/keyring v1.2.1
 	github.com/DataDog/datadog-go v3.2.0+incompatible
-	github.com/DataDog/zstd v1.5.5
+	github.com/DataDog/zstd v1.5.6
 	github.com/beorn7/perks v1.0.1
 	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816
 	github.com/bytedance/sonic v1.13.2
@@ -40,14 +42,14 @@ require (
 	github.com/cockroachdb/errors v1.11.3
 	github.com/cockroachdb/fifo v0.0.0-20240606204812-0bbfbd93a7ce
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b
-	github.com/cockroachdb/pebble v1.1.0
+	github.com/cockroachdb/pebble v1.1.2
 	github.com/cockroachdb/redact v1.1.6
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06
 	github.com/cometbft/cometbft v0.38.17
 	github.com/cometbft/cometbft-db v0.14.1
 	github.com/cosmos/btcutil v1.0.5
 	github.com/cosmos/cosmos-db v1.1.1
-	github.com/cosmos/cosmos-proto v1.0.0-beta.4
+	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmos/gogogateway v1.2.0
 	github.com/cosmos/gogoproto v1.7.0
