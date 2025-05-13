@@ -19,7 +19,11 @@ require (
 	github.com/cosmos/cosmos-sdk v0.53.0
 )
 
-require github.com/confio/ics23/go v0.9.0 // indirect
+require (
+	github.com/armon/go-metrics v0.4.1 // indirect
+	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
+	github.com/confio/ics23/go v0.9.0 // indirect
+)
 
 require (
 	cosmossdk.io/api v0.9.2 // indirect
@@ -136,6 +140,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
+	github.com/tendermint/tendermint v0.35.9
 	github.com/tidwall/btree v1.7.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/zondax/hid v0.9.2 // indirect
