@@ -1,0 +1,197 @@
+syntax = "proto3";
+package proofofservice.v1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/serv-chain/serv/x/proofofservice/types";
+
+// Msg defines the proofofservice Msg service.
+service Msg {
+  // RegisterService defines a method for registering a service provider.
+  rpc RegisterService(MsgRegisterService) returns (MsgRegisterServiceResponse) {
+    option (google.api.http).post = "/proofofservice/v1/register_service";
+  }
+
+  // SubmitProof defines a method for submitting proof of service.
+  rpc SubmitProof(MsgSubmitProof) returns (MsgSubmitProofResponse) {
+    option (google.api.http).post = "/proofofservice/v1/submit_proof";
+  }
+
+  // VerifyProof defines a method for verifying a proof of service.
+  rpc VerifyProof(MsgVerifyProof) returns (MsgVerifyProofResponse) {
+    option (google.api.http).post = "/proofofservice/v1/verify_proof";
+  }
+}
+
+// MsgRegisterService represents a message to register as a service provider.
+message MsgRegisterService {
+  string provider = 1;
+  string service_type = 2;
+  string metadata = 3;
+}
+
+// MsgRegisterServiceResponse defines the response for MsgRegisterService.
+message MsgRegisterServiceResponse {}
+
+// MsgSubmitProof represents a message to submit proof of service.
+message MsgSubmitProof {
+  string provider = 1;
+  string service_type = 2;
+  string proof_id = 3;
+  string evidence = 4;
+}
+
+// MsgSubmitProofResponse defines the response for MsgSubmitProof.
+message MsgSubmitProofResponse {}
+
+// MsgVerifyProof represents a message to verify a proof of service.
+message MsgVerifyProof {
+  string validator = 1;
+  string provider = 2;
+  string proof_id = 3;
+  bool is_verified = 4;
+  uint64 score = 5;
+}
+
+// MsgVerifyProofResponse defines the response for MsgVerifyProof.
+message MsgVerifyProofResponse {}
+
+// ServiceProvider represents a registered service provider.
+message ServiceProvider {
+  string address = 1;
+  string service_type = 2;
+  string metadata = 3;
+  google.protobuf.Timestamp registered_at = 4 [(gogoproto.stdtime) = true];
+  bool active = 5;
+}
+
+// ServiceProof represents a proof of service submission.
+message ServiceProof {
+  string proof_id = 1;
+  string provider = 2;
+  string service_type = 3;
+  string evidence = 4;
+  google.protobuf.Timestamp timestamp = 5 [(gogoproto.stdtime) = true];
+  bool verified = 6;
+  repeated string verified_by = 7;
+  string score = 8 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+}
+
+// ServiceScore represents the accumulated service score for a provider.
+message ServiceScore {
+  string provider = 1;
+  string score = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  uint64 last_updated = 3;
+}
+
+// ServiceParams represents the parameters for service validation.
+message ServiceParams {
+  uint32 min_verifications = 1;
+  string score_decay_rate = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  uint64 proof_validity_period = 3;
+  uint32 max_proofs_per_epoch = 4;
+}
+
+// Query defines the proofofservice Query service.
+service Query {
+  // ServiceParams queries the current service parameters.
+  rpc ServiceParams(QueryServiceParamsRequest) returns (QueryServiceParamsResponse) {
+    option (google.api.http).get = "/proofofservice/v1/params";
+  }
+
+  // ServiceProvider queries a service provider by address.
+  rpc ServiceProvider(QueryServiceProviderRequest) returns (QueryServiceProviderResponse) {
+    option (google.api.http).get = "/proofofservice/v1/provider/{address}";
+  }
+
+  // ServiceProviders queries all service providers, optionally filtered by service type.
+  rpc ServiceProviders(QueryServiceProvidersRequest) returns (QueryServiceProvidersResponse) {
+    option (google.api.http).get = "/proofofservice/v1/providers";
+  }
+
+  // Proof queries a proof of service.
+  rpc Proof(QueryProofRequest) returns (QueryProofResponse) {
+    option (google.api.http).get = "/proofofservice/v1/proof/{provider}/{proof_id}";
+  }
+
+  // ServiceScore queries the service score for an address.
+  rpc ServiceScore(QueryServiceScoreRequest) returns (QueryServiceScoreResponse) {
+    option (google.api.http).get = "/proofofservice/v1/score/{address}";
+  }
+
+  // TotalServiceScore queries the total service score.
+  rpc TotalServiceScore(QueryTotalServiceScoreRequest) returns (QueryTotalServiceScoreResponse) {
+    option (google.api.http).get = "/proofofservice/v1/total-score";
+  }
+}
+
+// QueryServiceParamsRequest is the request type for the Query/ServiceParams RPC method.
+message QueryServiceParamsRequest {}
+
+// QueryServiceParamsResponse is the response type for the Query/ServiceParams RPC method.
+message QueryServiceParamsResponse {
+  ServiceParams params = 1;
+}
+
+// QueryServiceProviderRequest is the request type for the Query/ServiceProvider RPC method.
+message QueryServiceProviderRequest {
+  string address = 1;
+}
+
+// QueryServiceProviderResponse is the response type for the Query/ServiceProvider RPC method.
+message QueryServiceProviderResponse {
+  ServiceProvider provider = 1;
+}
+
+// QueryServiceProvidersRequest is the request type for the Query/ServiceProviders RPC method.
+message QueryServiceProvidersRequest {
+  string service_type = 1;
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryServiceProvidersResponse is the response type for the Query/ServiceProviders RPC method.
+message QueryServiceProvidersResponse {
+  repeated ServiceProvider providers = 1;
+  // pagination defines the pagination in the response.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryProofRequest is the request type for the Query/Proof RPC method.
+message QueryProofRequest {
+  string provider = 1;
+  string proof_id = 2;
+}
+
+// QueryProofResponse is the response type for the Query/Proof RPC method.
+message QueryProofResponse {
+  ServiceProof proof = 1;
+}
+
+// QueryServiceScoreRequest is the request type for the Query/ServiceScore RPC method.
+message QueryServiceScoreRequest {
+  string address = 1;
+}
+
+// QueryServiceScoreResponse is the response type for the Query/ServiceScore RPC method.
+message QueryServiceScoreResponse {
+  string score = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+}
+
+// QueryTotalServiceScoreRequest is the request type for the Query/TotalServiceScore RPC method.
+message QueryTotalServiceScoreRequest {}
+
+// QueryTotalServiceScoreResponse is the response type for the Query/TotalServiceScore RPC method.
+message QueryTotalServiceScoreResponse {
+  string total_score = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+}
+
+// GenesisState defines the proofofservice module's genesis state.
+message GenesisState {
+  ServiceParams service_params = 1;
+  repeated ServiceProvider service_providers = 2;
+  repeated ServiceProof service_proofs = 3;
+  string total_service_score = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+}
